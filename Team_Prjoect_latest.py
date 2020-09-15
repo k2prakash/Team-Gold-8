@@ -1,8 +1,8 @@
-# This is a Python script written to fulfill the team assignment to aid with our research on  
+# This is a Python script written to fulfill the team assignment to aid with our research on
 # "What Makes an Employee go from "Good to Great"
 # The script takes an excel sheet as an input which contains the responses of all the employees in two columns
 # The scrip performs data processing on the responses and created dictionaries of related concepts
-# As part of post processing the dictionaries are further processes to extract data and build relatiionships between 
+# As part of post processing the dictionaries are further processes to extract data and build relatiionships between
 # them and the three motiational buckets, namely "Personal needs, Organizational Culture and Job Satisfaction"
 # The results are then plotted for further analysis using OB behavior principles
 # Author: Kaushik Prakash
@@ -16,6 +16,11 @@ import math
 
 file = r'C:\Users\kp409917\Desktop\Team project\Jay\Jay-Team project - Interview question sheet.xlsx'
 
+
+good_to_great_factors = {'Work': {}, 'Feedback': {}, 'Appreciation': {}, 'Opportunities': {}, 'Mentoring': {},
+                         'Culture': {}, 'Recognition': {}, 'Rewards': {}, 'Versatility': {},
+                         'Commitment': {}, 'Performance': {}, 'Competence': {}, 'Support': {}, 'Intelligence': {},
+                         'Creativity': {}}
 interviewee_dict = {}
 common_benefits = {"Retirement Plan", "Medical Insurance", "ESPP", "Vision", "Dental", "Vacation/Sick time",
                    "Life Insurance", "Disability Insurance", "Severance", "Assistance Plans", "Parental Leave",
@@ -30,6 +35,12 @@ common_motivators = {'Salary': {}, 'Religion': {}, 'Work': {}, 'Growth': {}, 'Pe
 
 combined_factors = {}
 
+primary_motivators = {'Salary': {}, 'Religion': {}, 'Work': {}, 'Growth': {}, 'People': {}, 'Influence': {},
+                      'Leadership': {}, 'Integrity': {}, 'Appreciation': {}, 'Family': {}, 'Learning': {},
+                      'Reward': {}, 'Mentorship': {}, 'Competition': {}, 'Success': {}, 'Fulfillment': {}, 'Role': {},
+                      'Company Culture': {}, 'Helping': {}, 'Goals': {}, 'Interaction': {}, 'Action': {}, 'Self': {},
+                      'Miscellaneous': {}, 'Competence': {}, 'Autonomy': {}}
+
 satisfaction_levels = {'Less Satisfied': {}, 'Moderately Satisfied': {}, 'Highly Satisfied': {}, 'Satisfied': {}}
 
 education_levels = {'Doctoral Degree': {}, 'Master\'s Degree': {}, 'Bachelor\'s Degree': {}, 'Associate\'s Degree': {},
@@ -39,12 +50,6 @@ education_levels = {'Doctoral Degree': {}, 'Master\'s Degree': {}, 'Bachelor\'s 
 employee_valuations = {'Good': {}, 'Great': {}, 'Unknown': {}, 'Neither': {}}
 
 common_buckets = {'Organizational Factors': {}, 'Personal needs': {}, 'Overcoming Inertia': {}}
-
-pay_satisfaction_levels = {'Less Satisfied': {}, 'Moderately Satisfied': {}, 'Highly Satisfied': {}, 'Satisfied': {},
-                           'NA': {}}
-
-leadership_satisfaction_levels = {'Less Satisfied': {}, 'Moderately Satisfied': {}, 'Highly Satisfied': {},
-                                  'Satisfied': {}, 'NA': {}}
 
 
 def get_seniority_level(title):
@@ -271,44 +276,311 @@ def process_personal_motivators(text, name):
     return
 
 
-def process_pay_satisfaction_levels(text, name):
-    if re.search('^not.*|^no.*|.*negat.*|.*lack.*|.*unfair.*|.*below.*|.*underpaid.*|.*small.*|.*less.*', text.lower(), re.IGNORECASE):
-        pay_satisfaction_levels['Less Satisfied'][name] = []
-        pay_satisfaction_levels['Less Satisfied'][name].append(text)
-    elif re.search('.*medi.*|.*moderat.*|.*paid more.*|.*reasonable.*|.*ok.*|.*okay|.*could be better.*', text.lower()):
-        pay_satisfaction_levels['Moderately Satisfied'][name] = []
-        pay_satisfaction_levels['Moderately Satisfied'][name].append(text)
-    elif re.search('^yes.*|.*sure.*|^satisfied.*|.*fair.*|.*general.*', text.lower()):
-        pay_satisfaction_levels['Satisfied'][name] = []
-        pay_satisfaction_levels['Satisfied'][name].append(text)
-    elif re.search('.*very.*|.*high|.*extrem.*|.*increas|.*great|.*competetive', text.lower()):
-        pay_satisfaction_levels['Highly Satisfied'][name] = []
-        pay_satisfaction_levels['Highly Satisfied'][name].append(text)
-    elif re.search('.*n\/a.*|.*\bna\b.*', text.lower()):
-        pay_satisfaction_levels['NA'][name] = []
-        pay_satisfaction_levels['NA'][name].append(text)
+def process_primary_motivators(text, name):
+    motivators = text.split(';')
+    for m in motivators:
+        if re.search('.*compete.*', m.lower()) or re.search('.*capab.*', m.lower()) or \
+                re.search('.*profici.*', m.lower()) or re.search('.*expert.*', m.lower()) or \
+                re.search('.*skill.*', m.lower()) or re.search('.*effect.*', m.lower()) or \
+                re.search('.*producti.*', m.lower()) or re.search('.*effect.*', m.lower()) or \
+                re.search('.*confiden.*', m.lower()) or re.search('.*determination.*', m.lower()) or \
+                re.search('.*ability.*', m.lower()):
+            if name not in primary_motivators['Competence'].keys():
+                primary_motivators['Competence'][name] = []
+                primary_motivators['Competence'][name].append(m.strip())
+            else:
+                primary_motivators['Competence'][name].append(m.strip())
+        elif re.search('.*live my life.*', m.lower()) or re.search('.*live the life i want.*', m.lower()) \
+                or re.search('.*Myself*', m.lower()) or re.search('.*\bme\b.*', m.lower()) \
+                or re.search('.*employee.*', m.lower()):
+            if name not in primary_motivators['Self'].keys():
+                primary_motivators['Self'][name] = []
+                primary_motivators['Self'][name].append(m.strip())
+            else:
+                primary_motivators['Self'][name].append(m.strip())
+        elif re.search('.*autonom*', m.lower()) or re.search('.*indepen.*', m.lower()) \
+                or re.search('.*freedom*', m.lower()) or re.search('.freewill*', m.lower()):
+            if name not in primary_motivators['Autonomy'].keys():
+                primary_motivators['Autonomy'][name] = []
+                primary_motivators['Autonomy'][name].append(m.strip())
+            else:
+                primary_motivators['Autonomy'][name].append(m.strip())
+        elif re.search('.*culture.*', m.lower()) or re.search('.*principles.*', m.lower()) or \
+                re.search('.*ethos.*', m.lower()) or re.search('.*philosoph.*', m.lower()) or \
+                re.search('.*mission.*', m.lower()) or re.search('.*values.*', m.lower()):
+            if name not in primary_motivators['Company Culture'].keys():
+                primary_motivators['Company Culture'][name] = []
+                primary_motivators['Company Culture'][name].append(m.strip())
+            else:
+                primary_motivators['Company Culture'][name].append(m.strip())
+        elif re.search('.*salary.*', m.lower()) or re.search('.*pay.*', m.lower()) or \
+                re.search('.*money.*', m.lower()) or re.search('.*hike.*', m.lower()) or \
+                re.search('.*incentive.*', m.lower()) or re.search('.*paid.*', m.lower()):
+            if name not in primary_motivators['Salary'].keys():
+                primary_motivators['Salary'][name] = []
+                primary_motivators['Salary'][name].append(m.strip())
+            else:
+                primary_motivators['Salary'][name].append(m.strip())
+        elif re.search('.*role.*', m.lower()) or re.search('.*occupation.*', m.lower()) \
+                or re.search('.*profess.*', m.lower()) or re.search('.*post.*', m.lower()) \
+                or re.search('.*position.*', m.lower()) or re.search('.*assignment.*', m.lower()) \
+                or re.search('.*activity.*', m.lower()):
+            if name not in primary_motivators['Role'].keys():
+                primary_motivators['Role'][name] = []
+                primary_motivators['Role'][name].append(m.strip())
+            else:
+                primary_motivators['Role'][name].append(m.strip())
+        elif re.search('.*fullfil.*', m.lower()) or re.search('.*accomplish.*', m.lower()) \
+                or re.search('.*satisf.*', m.lower()):
+            if name not in primary_motivators['Fulfillment'].keys():
+                primary_motivators['Fulfillment'][name] = []
+                primary_motivators['Fulfillment'][name].append(m.strip())
+            else:
+                primary_motivators['Fulfillment'][name].append(m.strip())
+        elif re.search('.*religion.*', m.lower()):
+            if name not in primary_motivators['Religion'].keys():
+                primary_motivators['Religion'][name] = []
+                primary_motivators['Religion'][name].append(m.strip())
+            else:
+                primary_motivators['Religion'][name].append(m.strip())
+        elif re.search('.*influenc.*', m.lower()) or re.search('.*difference.*', m.lower()) \
+                or re.search('.*betterment.*', m.lower()) or re.search('.*bettering.*', m.lower()):
+            if name not in primary_motivators['Influence'].keys():
+                primary_motivators['Influence'][name] = []
+                primary_motivators['Influence'][name].append(m.strip())
+            else:
+                primary_motivators['Influence'][name].append(m.strip())
+        elif re.search('.*growth.*', m.lower()) or re.search('.*promot.*', m.lower()) or \
+                re.search('.*progress.*', m.lower()):
+            if name not in primary_motivators['Growth'].keys():
+                primary_motivators['Growth'][name] = []
+                primary_motivators['Growth'][name].append(m.strip())
+            else:
+                primary_motivators['Growth'][name].append(m.strip())
+        elif re.search('.*work.*', m.lower()) or re.search('.*tasks.*', m.lower()) \
+                or re.search('.*industry.*', m.lower()) or re.search('.*produc.*', m.lower()) \
+                or re.search('.*job.*', m.lower()) or re.search('.*process.*', m.lower()):
+            if name not in primary_motivators['Work'].keys():
+                primary_motivators['Work'][name] = []
+                primary_motivators['Work'][name].append(m.strip())
+            else:
+                primary_motivators['Work'][name].append(m.strip())
+        elif re.search('.*team.*', m.lower()) or re.search('.*colleag', m.lower()) or \
+                re.search('.*partner', m.lower()) or re.search('.*member', m.lower()) or \
+                re.search('.*co.*work', m.lower()) or re.search('.*patient', m.lower()):
+            if name not in primary_motivators['People'].keys():
+                primary_motivators['People'][name] = []
+                primary_motivators['People'][name].append(m.strip())
+            else:
+                primary_motivators['People'][name].append(m.strip())
+
+        elif re.search('.*mentor.*', m.lower()) or re.search('.*guide.*', m.lower()) \
+                or re.search('.*advice.*', m.lower()) or re.search('.*counsel.*', m.lower()) or \
+                re.search('.*teach.*', m.lower()):
+            if name not in primary_motivators['Mentorship'].keys():
+                primary_motivators['Mentorship'][name] = []
+                primary_motivators['Mentorship'][name].append(m.strip())
+            else:
+                primary_motivators['Mentorship'][name].append(m.strip())
+        elif re.search('.*leader.*', m.lower()) or re.search('.*mentor.*', m.lower()) \
+                or re.search('.*supervisor.*', m.lower()) or re.search('.*manag.*', m.lower()):
+            if name not in primary_motivators['Leadership'].keys():
+                primary_motivators['Leadership'][name] = []
+                primary_motivators['Leadership'][name].append(m.strip())
+            else:
+                primary_motivators['Leadership'][name].append(m.strip())
+        elif re.search('.*value.*', m.lower()) or re.search('.*appreicat.*', m.lower()):
+            if name not in primary_motivators['Appreciation'].keys():
+                primary_motivators['Appreciation'][name] = []
+                primary_motivators['Appreciation'][name].append(m.strip())
+            else:
+                primary_motivators['Appreciation'][name].append(m.strip())
+        elif re.search('.*help.*', m.lower()) or re.search('.*assist.*', m.lower()) or \
+                re.search('.*aid.*', m.lower()) or re.search('.*service.*', m.lower()) or \
+                re.search('.*support.*', m.lower()) or re.search('.*contribut.*', m.lower()):
+            if name not in primary_motivators['Helping'].keys():
+                primary_motivators['Helping'][name] = []
+                primary_motivators['Helping'][name].append(m.strip())
+            else:
+                primary_motivators['Helping'][name].append(m.strip())
+        elif re.search('.*integrity.*', m.lower()) or re.search('.*honest.*', m.lower()):
+            if name not in primary_motivators['Integrity'].keys():
+                primary_motivators['Integrity'][name] = []
+                primary_motivators['Integrity'][name].append(m.strip())
+            else:
+                primary_motivators['Integrity'][name].append(m.strip())
+        elif re.search('.*family.*', m.lower()) or re.search('.*wife.*', m.lower()) \
+                or re.search('.*child.*', m.lower()):
+            if name not in primary_motivators['Integrity'].keys():
+                primary_motivators['Family'][name] = []
+                primary_motivators['Family'][name].append(m.strip())
+            else:
+                primary_motivators['Family'][name].append(m.strip())
+        elif re.search('.*learn.*', m.lower()) or re.search('.*educat.*', m.lower()):
+            if name not in primary_motivators['Learning'].keys():
+                primary_motivators['Learning'][name] = []
+                primary_motivators['Learning'][name].append(m.strip())
+            else:
+                primary_motivators['Learning'][name].append(m.strip())
+        elif re.search('.*rewar.*', m.lower()) or re.search('.*award.*', m.lower()):
+            if name not in primary_motivators['Rewards'].keys():
+                primary_motivators['Rewards'][name] = []
+                primary_motivators['Rewards'][name].append(m.strip())
+            else:
+                primary_motivators['Rewards'][name].append(m.strip())
+        elif re.search('.*competition.*', m.lower()) or re.search('.*rivalry.*', m.lower()):
+            if name not in primary_motivators['Competition'].keys():
+                primary_motivators['Competition'][name] = []
+                primary_motivators['Competition'][name].append(m.strip())
+            else:
+                primary_motivators['Competition'][name].append(m.strip())
+        elif re.search('.*success.*', m.lower()) or re.search('.*accomplish.*', m.lower()) \
+                or re.search('.*achieve.*', m.lower()) or re.search('.*victor.*', m.lower()) \
+                or re.search('.*win.*', m.lower()) or re.search('.*progress.*', m.lower()):
+            if name not in primary_motivators['Success'].keys():
+                primary_motivators['Success'][name] = []
+                primary_motivators['Success'][name].append(m.strip())
+            else:
+                primary_motivators['Success'][name].append(m.strip())
+        elif re.search('.*goal.*', m.lower()) or re.search('.*intention.*', m.lower()) \
+                or re.search('.*sale.*', m.lower()) or re.search('.*target.*', m.lower()) \
+                or re.search('.*objective.*', m.lower()) or re.search('.*desire.*', m.lower()):
+            if name not in primary_motivators['Goals'].keys():
+                primary_motivators['Goals'][name] = []
+                primary_motivators['Goals'][name].append(m.strip())
+            else:
+                primary_motivators['Goals'][name].append(m.strip())
+        elif re.search('.*interact.*', m.lower()) or re.search('.*communicat.*', m.lower()) \
+                or re.search('.*talk.*', m.lower()) or re.search('.*exchange.*', m.lower()) \
+                or re.search('.*reciproc.*', m.lower()) or re.search('.*relationship.*', m.lower()):
+            if name not in primary_motivators['Interaction'].keys():
+                primary_motivators['Interaction'][name] = []
+                primary_motivators['Interaction'][name].append(m.strip())
+            else:
+                primary_motivators['Interaction'][name].append(m.strip())
+        elif re.search('.*implement.*', m.lower()) or re.search('.*perform.*', m.lower()) \
+                or re.search('.*carry.*out.*', m.lower()) or re.search('.*deed.*', m.lower()) \
+                or re.search('.*execut.*', m.lower()):
+            if name not in primary_motivators['Action'].keys():
+                primary_motivators['Action'][name] = []
+                primary_motivators['Action'][name].append(m.strip())
+            else:
+                primary_motivators['Action'][name].append(m.strip())
+
+    return
 
 
-def process_leadership_satisfaction_levels(text, name):
-    if re.search('^not.*|^no.*|.*negat.*|.*lack.*|.*unfair.*|.*below.*|.*underpaid.*|.*small.*|.*less.*|.*minimal.*',
-                 text.lower(), re.IGNORECASE):
-        leadership_satisfaction_levels['Less Satisfied'][name] = []
-        leadership_satisfaction_levels['Less Satisfied'][name].append(text)
-    elif re.search('.*medi.*|.*moderat.*|.*average.|.*somewhat.*|.*situational.*|.*ok.*|.*okay', text.lower()):
-        leadership_satisfaction_levels['Moderately Satisfied'][name] = []
-        leadership_satisfaction_levels['Moderately Satisfied'][name].append(text)
-    elif re.search('.*very.*|.*high|.*everytime.*|.*great|.*100%.*', text.lower()):
-        leadership_satisfaction_levels['Highly Satisfied'][name] = []
-        leadership_satisfaction_levels['Highly Satisfied'][name].append(text)
-    elif re.search('.*yes.*|.*sure.*|^satisfied.*|.*fair.*|.*general.*', text.lower()):
-        leadership_satisfaction_levels['Satisfied'][name] = []
-        leadership_satisfaction_levels['Satisfied'][name].append(text)
-    elif re.search('.*n\/a.*|.*\bna\b.*', text.lower()):
-        leadership_satisfaction_levels['NA'][name] = []
-        leadership_satisfaction_levels['NA'][name].append(text)
-    else:
-        leadership_satisfaction_levels['NA'][name] = []
-        leadership_satisfaction_levels['NA'][name].append(text)
+def process_recommendation(text, name):
+    recommendations = text.split(';')
+    for r in recommendations:
+        if re.search('.*versatil.*', r.lower()) or re.search('.*flexib.*', r.lower()) or \
+                re.search('.*round.*', r.lower()) or re.search('.*adapt.*', r.lower()):
+            if name not in good_to_great_factors['Versatility'].keys():
+                good_to_great_factors['Versatility'][name] = []
+                good_to_great_factors['Versatility'][name].append(r.strip())
+            else:
+                good_to_great_factors['Versatility'][name].append(r.strip())
+        elif re.search('.*rewar.*', r.lower()) or re.search('.*award.*', r.lower()):
+            if name not in good_to_great_factors['Rewards'].keys():
+                good_to_great_factors['Rewards'][name] = []
+                good_to_great_factors['Rewards'][name].append(r.strip())
+            else:
+                good_to_great_factors['Rewards'][name].append(r.strip())
+        elif re.search('.*recogni.*', r.lower()) or re.search('.*fame.*', r.lower()) \
+                or re.search('.*greatness.*', r.lower()) or re.search('.*importance.*', r.lower()):
+            if name not in good_to_great_factors['Recognition'].keys():
+                good_to_great_factors['Recognition'][name] = []
+                good_to_great_factors['Recognition'][name].append(r.strip())
+            else:
+                good_to_great_factors['Recognition'][name].append(r.strip())
+        elif re.search('.*cult.*', r.lower()) or re.search('.*workplace.*', r.lower()):
+            if name not in good_to_great_factors['Culture'].keys():
+                good_to_great_factors['Culture'][name] = []
+                good_to_great_factors['Culture'][name].append(r.strip())
+            else:
+                good_to_great_factors['Culture'][name].append(r.strip())
+        elif re.search('.*feedback.*', r.lower()) or re.search('.*assess.*', r.lower()):
+            if name not in good_to_great_factors['Feedback'].keys():
+                good_to_great_factors['Feedback'][name] = []
+                good_to_great_factors['Feedback'][name].append(r.strip())
+            else:
+                good_to_great_factors['Feedback'][name].append(r.strip())
+        elif re.search('.*work.*', r.lower()) or re.search('.*challen.*', r.lower()) \
+                or re.search('.*challen.*', r.lower()):
+            if name not in good_to_great_factors['Work'].keys():
+                good_to_great_factors['Work'][name] = []
+                good_to_great_factors['Work'][name].append(r.strip())
+            else:
+                good_to_great_factors['Work'][name].append(r.strip())
+        elif re.search('.*value.*', r.lower()) or re.search('.*appreciat.*', r.lower()):
+            if name not in good_to_great_factors['Appreciation'].keys():
+                good_to_great_factors['Appreciation'][name] = []
+                good_to_great_factors['Appreciation'][name].append(r.strip())
+            else:
+                good_to_great_factors['work'][name].append(r.strip())
+        elif re.search('.*opportun.*', r.lower()) or re.search('.*roles.*', r.lower()):
+            if name not in good_to_great_factors['Opportunities'].keys():
+                good_to_great_factors['Opportunities'][name] = []
+                good_to_great_factors['Opportunities'][name].append(r.strip())
+            else:
+                good_to_great_factors['Opportunities'][name].append(r.strip())
+        elif re.search('.*mentor.*', r.lower()) or re.search('.*encour.*', r.lower()) or \
+                re.search('.*motiv.*', r.lower()):
+            if name not in good_to_great_factors['Mentoring'].keys():
+                good_to_great_factors['Mentoring'][name] = []
+                good_to_great_factors['Mentoring'][name].append(r.strip())
+            else:
+                good_to_great_factors['Mentoring'][name].append(r.strip())
+        elif re.search('.*commit.*', r.lower()) or re.search('.*trust.*', r.lower()) or \
+                re.search('.*loyal.*', r.lower()) or re.search('.*dependab.*', r.lower()) or \
+                re.search('.*dedicat.*', r.lower()) or re.search('.*account.*', r.lower()) or \
+                re.search('.*follow through.*', r.lower()):
+            if name not in good_to_great_factors['Commitment'].keys():
+                good_to_great_factors['Commitment'][name] = []
+                good_to_great_factors['Commitment'][name].append(r.strip())
+            else:
+                good_to_great_factors['Commitment'][name].append(r.strip())
+        elif re.search('.*perform.*', r.lower()) or re.search('.*excel.*', r.lower()) or \
+                re.search('.*exceed.*', r.lower()) or re.search('.*surpass.*', r.lower()) or \
+                re.search('.*going above and beyond.*', r.lower()):
+            if name not in good_to_great_factors['Performance'].keys():
+                good_to_great_factors['Performance'][name] = []
+                good_to_great_factors['Performance'][name].append(r.strip())
+            else:
+                good_to_great_factors['Performance'][name].append(r.strip())
+        elif re.search('.*compete.*', r.lower()) or re.search('.*capab.*', r.lower()) or \
+                re.search('.*profici.*', r.lower()) or re.search('.*expert.*', r.lower()) or \
+                re.search('.*skill.*', r.lower()) or re.search('.*effect.*', r.lower()) or \
+                re.search('.*producti.*', r.lower()) or re.search('.*effect.*', r.lower()) or \
+                re.search('.*confiden.*', r.lower() or re.search('.*determination.*', r.lower())):
+            if name not in good_to_great_factors['Competence'].keys():
+                good_to_great_factors['Competence'][name] = []
+                good_to_great_factors['Competence'][name].append(r.strip())
+            else:
+                good_to_great_factors['Competence'][name].append(r.strip())
+        elif re.search('.*support.*', r.lower()) or re.search('.*assist.*', r.lower()) or \
+                re.search('.*help.*', r.lower()):
+            if name not in good_to_great_factors['Support'].keys():
+                good_to_great_factors['Support'][name] = []
+                good_to_great_factors['Support'][name].append(r.strip())
+            else:
+                good_to_great_factors['Support'][name].append(r.strip())
+        elif re.search('.*intellig.*', r.lower()) or re.search('.*intellect.*', r.lower()) or \
+                re.search('.*acumen.*', r.lower()) or re.search('.*aptitude.*', r.lower()):
+            if name not in good_to_great_factors['Intelligence'].keys():
+                good_to_great_factors['Intelligence'][name] = []
+                good_to_great_factors['Intelligence'][name].append(r.strip())
+            else:
+                good_to_great_factors['Intelligence'][name].append(r.strip())
+        elif re.search('.*creat.*', r.lower()) or re.search('.*outside the box.*', r.lower()):
+            if name not in good_to_great_factors['Creativity'].keys():
+                good_to_great_factors['Creativity'][name] = []
+                good_to_great_factors['Creativity'][name].append(r.strip())
+            else:
+                good_to_great_factors['Creativity'][name].append(r.strip())
+    # for key in good_to_great_factors:
+    #    for attributes in good_to_great_factors[key]:
+    #        print(attributes)
 
 
 def process_employee_valuation(text, question, name):
@@ -372,10 +644,141 @@ def process_education_level(text, name):
         education_levels['Doctoral Degree'][name].append(text)
 
 
+def get_employee_benefits(text):
+    employee_benefits = {}
+    items = text.split(',')
+    retirement_pattern = re.compile('.*40.*|roth|ira|prov.*|.*retir|.*pension|.*gratuity')
+    med_insurance_pattern = re.compile('.*medi.*|.*health.*')
+    espp_pattern = re.compile('.*espp|.*share.*')
+    life_insurance_pattern = re.compile('.*life.*')
+    disability_insurance_pattern = re.compile('.*disability.*')
+    vision_pattern = re.compile('.*vision.*')
+    dental_pattern = re.compile('.*dental.*')
+    vacation_pattern = re.compile('.*pto|.*sick|.*paid|.*volun.*')
+    parental_pattern = re.compile('.*maternal|.*paternal|.*parental')
+    emp_wellness_pattern = re.compile('.*wellness|.*yoga|.*exerci|.*hiit.*|.*tabata|.*fit')
+    pet_insurance_pattern = re.compile('.*pet.*')
+    company_car_pattern = re.compile('.*company car.*|.*company vehicle')
+    air_travel_pattern = re.compile('.*air*|.*aero|.*plane')
+    work_amenities_pattern = re.compile('.*cafeteria|.*gym')
+    accom_allowance_pattern = re.compile('.*accom*')
+    flex_work_pattern = re.compile('.*flex*')
+    severance_pattern = re.compile('.*sever*')
+    work_comp_pattern = re.compile('.*compens*')
+    education_allowance_pattern = re.compile('.*educ*|.*tuition')
+    entertainment_pattern = re.compile('.*entertainment*')
+    for benefit in items:
+        if retirement_pattern.match(benefit.lower()):
+            if 'Retirement Plan' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Retirement Plan'] = 0
+        elif med_insurance_pattern.match(benefit.lower()):
+            if 'Medical Insurance' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Medical Insurance'] = 0
+        elif entertainment_pattern.match(benefit.lower()):
+            if 'Entertainment' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Entertainment'] = 0
+        elif espp_pattern.match(benefit.lower()):
+            if 'ESPP' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['ESPP'] = 0
+        elif life_insurance_pattern.match(benefit.lower()):
+            if 'Life Insurance' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Life Insurance'] = 0
+        elif disability_insurance_pattern.match(benefit.lower()):
+            if 'Disability Insurance' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Disability Insurance'] = 0
+        elif vision_pattern.match(benefit.lower()):
+            if 'Vision' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Vision'] = 0
+        elif dental_pattern.match(benefit.lower()):
+            if 'Dental' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Dental'] = 0
+        elif vacation_pattern.match(benefit.lower()):
+            if 'Paid Vacation' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Paid Vacation'] = 0
+        elif parental_pattern.match(benefit.lower()):
+            if 'Parental Leave' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Parental Leave'] = 0
+        elif emp_wellness_pattern.match(benefit.lower()):
+            if 'Employee Wellness' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Employee Wellness'] = 0
+        elif pet_insurance_pattern.match(benefit.lower()):
+            if 'Pet Insurance' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Pet Insurance'] = 0
+        elif company_car_pattern.match(benefit.lower()):
+            if 'Company Car' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Company Car'] = 0
+        elif air_travel_pattern.match(benefit.lower()):
+            if 'Air Travel' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Air Travel'] = 0
+        elif work_amenities_pattern.match(benefit.lower()):
+            if 'Workplace Amenities' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Workplace Amenities'] = 0
+        elif accom_allowance_pattern.match(benefit.lower()):
+            if 'Accommodation Allowance' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Accommodation Allowance'] = 0
+        elif flex_work_pattern.match(benefit.lower()):
+            if 'Work Flexibility' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Work Flexibility'] = 0
+        elif severance_pattern.match(benefit.lower()):
+            if 'Severance' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Severance'] = 0
+        elif work_comp_pattern.match(benefit.lower()):
+            if 'Work Compensation' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Work Compensation'] = 0
+        elif education_allowance_pattern.match(benefit.lower()):
+            if 'Education' in employee_benefits.keys():
+                continue
+            else:
+                employee_benefits['Education'] = 0
+    return employee_benefits
+
+
 def process_excel():
     excel_file = pd.ExcelFile(file)
     # print(excel_file.sheet_names)
     for name in excel_file.sheet_names:
+        # if name == 'Marissa Prakash' or name == 'Cate Hite' or name == 'Gary Johnson' or name == 'Kimberly Johnson' or \
+        #        name == 'Ravi Prakash':
+        # if name == 'MM':
+
         df = pd.read_excel(file, name)
         for index in df.index:
             m1 = re.search(".*nan.*", str(df['Responses'][index]))
@@ -387,12 +790,14 @@ def process_excel():
             m7 = re.search(r'.*married.*', str(df['Questions'][index]).lower())
             m8 = re.search(r'gender.*', str(df['Questions'][index]).lower())
             m10 = re.search(r'do you believe you\'re a good employee.*', str(df['Questions'][index]).lower())
+            m11 = re.search(r'what benefits are current.*', str(df['Questions'][index]).lower())
             m12 = re.search(r'what motivates you.*', str(df['Questions'][index]).lower())
             m13 = re.search(r'are you satisfied in.*', str(df['Questions'][index]).lower())
             m14 = re.search(r'what is your highest level of educ', str(df['Questions'][index]).lower())
+            m69 = re.search(r'Any recommendations on what.*', str(df['Questions'][index]))
+            m15 = re.search(r'what is your primary motivator.*', str(df['Questions'][index]).lower())
             m16 = re.search(r'do you believe you\'re a great employee.*', str(df['Questions'][index]).lower())
-            m17 = re.search(r'how do you feel about your pay.*', str(df['Questions'][index]).lower())
-            m18 = re.search(r'do you receive support from you direct leader.*', str(df['Questions'][index]).lower())
+
             if m2:
                 interviewee_dict[name] = {}
             elif m3:
@@ -409,6 +814,8 @@ def process_excel():
                 interviewee_dict[name]['Gender'] = str(df['Responses'][index])
             elif m10:
                 process_employee_valuation(str(df['Responses'][index]), 'good', name)
+            elif m11:
+                interviewee_dict[name]['Benefits'] = get_employee_benefits(str(df['Responses'][index]))
             elif m12:
                 process_personal_motivators(str(df['Responses'][index]), name)
             elif m13:
@@ -416,12 +823,12 @@ def process_excel():
             elif m14:
                 interviewee_dict[name]['Education Level'] = str(df['Responses'][index])
                 process_education_level(str(df['Responses'][index]), name)
+            elif m69:
+                process_recommendation(str(df['Responses'][index]), name)
+            elif m15:
+                process_primary_motivators(str(df['Responses'][index]), name)
             elif m16:
                 process_employee_valuation(str(df['Responses'][index]), 'great', name)
-            elif m17:
-                process_pay_satisfaction_levels(str(df['Responses'][index]), name)
-            elif m18:
-                process_leadership_satisfaction_levels(str(df['Responses'][index]), name)
             elif m1:
                 continue
 
@@ -435,7 +842,27 @@ def get_count_of_attribute(attribute_dict):
 
 
 def post_process():
-    
+    benefits_count_dict = {}
+    retirement_count = 0
+    medical_insurance_count = 0
+    espp_count = 0
+    vision_count = 0
+    dental_count = 0
+    vacation_count = 0
+    life_insurance_count = 0
+    disability_count = 0
+    severance_count = 0
+    parental_count = 0
+    emp_wellness_count = 0
+    flexwork_count = 0
+    pet_insurance_count = 0
+    company_car_count = 0
+    air_travel_count = 0
+    work_amen_count = 0
+    accom_allow_count = 0
+    work_comp_count = 0
+    educ_allow_count = 0
+    entertainment_count = 0
     print("These are the details of the people who were interviewed.")
     for person in interviewee_dict.keys():
         print("Name: {0}".format(person))
@@ -447,6 +874,86 @@ def post_process():
         print("Marital Status: {0}".format(interviewee_dict[person]['Marital Status']))
         print("Education Level: {0}".format(interviewee_dict[person]['Education Level']))
         print("\n")
+        for benefit in interviewee_dict[person]['Benefits']:
+            if benefit == 'Retirement Plan':
+                retirement_count += 1
+            elif benefit == 'Medical Insurance':
+                medical_insurance_count += 1
+            elif benefit == 'ESPP':
+                espp_count += 1
+            elif benefit == 'ESPP':
+                espp_count += 1
+            elif benefit == 'Vision':
+                vision_count += 1
+            elif benefit == 'Dental':
+                dental_count += 1
+            elif benefit == 'Paid Vacation':
+                vacation_count += 1
+            elif benefit == 'Life Insurance':
+                life_insurance_count += 1
+            elif benefit == 'Disability Insurance':
+                disability_count += 1
+            elif benefit == 'Severance':
+                severance_count += 1
+            elif benefit == 'Parental Leave':
+                parental_count += 1
+            elif benefit == 'Employee Wellness':
+                emp_wellness_count += 1
+            elif benefit == 'Work Flexibility':
+                flexwork_count += 1
+            elif benefit == 'Pet Insurance':
+                pet_insurance_count += 1
+            elif benefit == 'Company Car':
+                company_car_count += 1
+            elif benefit == 'Air Travel':
+                air_travel_count += 1
+            elif benefit == 'Workplace Amenities':
+                work_amen_count += 1
+            elif benefit == 'Accommodation Allowance':
+                accom_allow_count += 1
+            elif benefit == 'Work Compensation':
+                work_comp_count += 1
+            elif benefit == 'Education':
+                educ_allow_count += 1
+            elif benefit == 'Entertainment':
+                entertainment_count += 1
+
+    benefits_count_dict['Retirement Plan'] = retirement_count
+    benefits_count_dict['Medical Insurance'] = medical_insurance_count
+    benefits_count_dict['ESPP'] = espp_count
+    benefits_count_dict['Vision'] = vision_count
+    benefits_count_dict['Dental'] = dental_count
+    benefits_count_dict['Paid Vacation'] = vacation_count
+    benefits_count_dict['Life Insurance'] = life_insurance_count
+    benefits_count_dict['Disability Insurance'] = disability_count
+    benefits_count_dict['Severance'] = severance_count
+    benefits_count_dict['Parental Leave'] = parental_count
+    benefits_count_dict['Employee Wellness'] = emp_wellness_count
+    benefits_count_dict['Work Flexibility'] = flexwork_count
+    benefits_count_dict['Pet Insurance'] = pet_insurance_count
+    benefits_count_dict['Company Car'] = company_car_count
+    benefits_count_dict['Air Travel'] = air_travel_count
+    benefits_count_dict['Workplace Amenities'] = work_amen_count
+    benefits_count_dict['Accommodation Allowance'] = accom_allow_count
+    benefits_count_dict['Work Compensation'] = work_comp_count
+    benefits_count_dict['Education'] = educ_allow_count
+    benefits_count_dict['Entertainment'] = entertainment_count
+
+    print("Benefits Analysis")
+    print("-------------------------------------------------------------------------------------------")
+
+    for key in benefits_count_dict:
+        if benefits_count_dict[key] > 0:
+            print("{0} benefits were brought up {1} time(s)".format(key, benefits_count_dict[key]))
+    print("\n")
+    sorted_benefits_by_count = sorted(benefits_count_dict.items(), key=lambda x: x[1],
+                                      reverse=True)
+    print("Benefits listed in the order of highest to the least counts")
+    for i in sorted_benefits_by_count:
+        if i[1] > 0:
+            print("\t{0} {1}".format(i[0], i[1]))
+    print("\n")
+
     print("Interviewee responses for \"Are you satisfied in your role?\"")
     print("-------------------------------------------------------------------------------------------")
     satisfact_levels_xaxis = []
@@ -528,68 +1035,10 @@ def post_process():
     plt.xticks(x_pos, valuation_labels_xaxis, rotation=45, fontsize=14)
     plt.yticks(y_pos, fontsize=15)
     plt.ylabel('Interviewee Count', fontsize=15, labelpad=10)
-    plt.title('Analysis of Employee \"Good vs Great\" Evaluation', fontsize=20)
+    plt.title('Analysis of Employee Valuation', fontsize=20)
     for index, data in enumerate(valuation_count_yaxis):
         plt.text(x=index, y=data + 1, s=f"{data}", fontsize='20')
     plt.savefig(r'C:\Users\kp409917\Desktop\Employee_Valuation.png')
-
-    print("Employee Pay evaluation analysis")
-    print("-------------------------------------------------------------------------------------------")
-    pay_valuation_labels_xaxis = []
-    pay_valuation_count_yaxis = []
-    for key in pay_satisfaction_levels.keys():
-        pay_valuation_labels_xaxis.append(key)
-        pay_valuation_count_yaxis.append(get_count_of_attribute(pay_satisfaction_levels[key]))
-        print("\"{0}\" was mentioned {1} time(s).".format(key, get_count_of_attribute(pay_satisfaction_levels[key])))
-        for name in pay_satisfaction_levels[key]:
-            print("From {0}'s response: ".format(name))
-            for valuation in pay_satisfaction_levels[key][name]:
-                print("\t\"{0}\"".format(valuation))
-        print("\n")
-
-    cmaps = ['red', 'green', 'orange', 'cyan', 'brown', 'grey', 'blue', 'indigo', 'beige', 'yellow',
-             'purple', 'pink', 'maroon']
-
-    x_pos = np.arange(0, len(pay_valuation_labels_xaxis))
-    y_pos = np.arange(0, math.ceil(max(pay_valuation_count_yaxis)) + 10, step=5)
-    plt.figure(figsize=(10, 10))
-    plt.bar(x_pos, pay_valuation_count_yaxis, align='center', alpha=0.5, color=cmaps)
-    plt.xticks(x_pos, pay_valuation_labels_xaxis, rotation=30, fontsize=12)
-    plt.yticks(y_pos, fontsize=15)
-    plt.ylabel('Interviewee Count', fontsize=15, labelpad=10)
-    plt.title('Analysis of Employee Pay Evaluation', fontsize=20)
-    for index, data in enumerate(pay_valuation_count_yaxis):
-        plt.text(x=index, y=data + 1, s=f"{data}", fontsize='20')
-    plt.savefig(r'C:\Users\kp409917\Desktop\Employee Pay Valuation.png')
-
-    print("Employee Leadership evaluation analysis")
-    print("-------------------------------------------------------------------------------------------")
-    leadership_evaluation_labels_xaxis = []
-    leadership_evaluation_count_yaxis = []
-    for key in leadership_satisfaction_levels.keys():
-        leadership_evaluation_labels_xaxis.append(key)
-        leadership_evaluation_count_yaxis.append(get_count_of_attribute(leadership_satisfaction_levels[key]))
-        print("\"{0}\" was mentioned {1} time(s).".format(key, get_count_of_attribute(leadership_satisfaction_levels[key])))
-        for name in leadership_satisfaction_levels[key]:
-            print("From {0}'s response: ".format(name))
-            for valuation in leadership_satisfaction_levels[key][name]:
-                print("\t\"{0}\"".format(valuation))
-        print("\n")
-
-    cmaps = ['red', 'green', 'orange', 'cyan', 'brown', 'grey', 'blue', 'indigo', 'beige', 'yellow',
-             'purple', 'pink', 'maroon']
-
-    x_pos = np.arange(0, len(leadership_evaluation_labels_xaxis))
-    y_pos = np.arange(0, math.ceil(max(leadership_evaluation_count_yaxis)) + 10, step=5)
-    plt.figure(figsize=(10, 10))
-    plt.bar(x_pos, leadership_evaluation_count_yaxis, align='center', alpha=0.5, color=cmaps)
-    plt.xticks(x_pos, leadership_evaluation_labels_xaxis, rotation=30, fontsize=12)
-    plt.yticks(y_pos, fontsize=15)
-    plt.ylabel('Interviewee Count', fontsize=15, labelpad=10)
-    plt.title('Analysis of Employee Leadership Evaluation', fontsize=20)
-    for index, data in enumerate(leadership_evaluation_count_yaxis):
-        plt.text(x=index, y=data + 1, s=f"{data}", fontsize='20')
-    plt.savefig(r'C:\Users\kp409917\Desktop\Employee Leadership Evaluation.png')
 
     print("Interviewee responses for \"What motivates you?\"")
     print("-------------------------------------------------------------------------------------------")
@@ -772,13 +1221,12 @@ def post_process():
     plt.title('Analysis of Employee Motivators', fontsize='20')
     plt.savefig(r'C:\Users\kp409917\Desktop\motivators.png')
 
+ 
 
-''' 
-The Main script which will run the program 
-'''
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     process_excel()
     post_process()
 
-
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
